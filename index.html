@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#182d24">
+  <meta name="description" content="To Dublin — изумрудный мобильный паб. От рассвета до ночи — одна любимая атмосфера.">
+  <title>To Dublin — Паб там, где вы</title>
+  <link rel="preload" href="fonts/rye-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css?v=glass-modal-video">
+</head>
+<body data-phase="morning">
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="icon-sunrise" viewBox="0 0 24 24"><path d="M2 17h20M3 21h18M6 17a6 6 0 0 1 12 0M12 2v6m-3-3 3-3 3 3M3 11l2 2m14 0 2-2"/></symbol>
+    <symbol id="icon-sunset" viewBox="0 0 24 24"><path d="M2 17h20M3 21h18M6 17a6 6 0 0 1 12 0M12 2v6m-3-3 3 3 3-3M3 11l2 2m14 0 2-2"/></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/><path d="M17 3v4m-2-2h4m2 4v2m-1-1h2"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="icon-expand" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></symbol>
+  </svg>
+  <main class="experience" id="experience" aria-label="Мобильный паб от рассвета до ночи">
+    <div class="scenes" aria-hidden="true">
+      <div class="time-scene is-active" data-scene="morning" aria-hidden="false">
+        <picture><source media="(max-width: 700px)" srcset="courtyard-morning-busy-mobile.webp"><img class="scene-photo" src="courtyard-morning-busy.webp" alt="" fetchpriority="high" draggable="false"></picture>
+      </div>
+      <div class="time-scene" data-scene="day" aria-hidden="true">
+        <picture><source media="(max-width: 700px)" srcset="courtyard-day-busy-mobile.webp"><img class="scene-photo" src="courtyard-day-busy.webp" alt="" decoding="async" draggable="false"></picture>
+      </div>
+      <div class="time-scene" data-scene="sunset" aria-hidden="true">
+        <picture><source media="(max-width: 700px)" srcset="courtyard-sunset-busy-mobile.webp"><img class="scene-photo" src="courtyard-sunset-busy.webp" alt="" decoding="async" draggable="false"></picture>
+      </div>
+      <div class="time-scene" data-scene="night" aria-hidden="true">
+        <picture><source media="(max-width: 700px)" srcset="courtyard-night-busy-mobile.webp"><img class="scene-photo" src="courtyard-night-busy.webp" alt="" decoding="async" draggable="false"></picture>
+      </div>
+    </div>
+    <div class="scene-shade" aria-hidden="true"></div>
+    <canvas id="ambient" aria-hidden="true"></canvas>
+    <header class="site-header">
+      <span class="header-note">ХОРОШАЯ КОМПАНИЯ. НОВЫЕ МЕСТА.</span>
+    </header>
+    <div class="hero-copy">
+      <h1 class="brand-title">To Dublin</h1>
+      <p class="brand-subtitle">мобильный паб</p>
+      <button class="primary-button about-link" type="button" data-open-about>О нас</button>
+    </div>
+    <div class="scene-hint" aria-hidden="true"><span class="scroll-mark"></span><span class="desktop-hint">ЛИСТАЙТЕ, ЧТОБЫ СМЕНИТЬ ВРЕМЯ СУТОК</span><span class="mobile-hint">СМАХНИТЕ, ЧТОБЫ СМЕНИТЬ ВРЕМЯ СУТОК</span></div>
+    <footer class="scene-footer">
+      <div class="scene-info">
+        <span class="scene-count" id="sceneCount" aria-label="Время на сцене">07:00</span>
+        <div><h2 id="phaseName">Раннее утро</h2><p id="phaseNote">Мягкий свет. Новый день.</p></div>
+      </div>
+      <nav class="time-dock glass" aria-label="Выбрать время суток">
+        <button class="time-button is-active" data-phase="morning" aria-pressed="true"><svg aria-hidden="true"><use href="#icon-sunrise"/></svg><span>Утро</span></button>
+        <button class="time-button" data-phase="day" aria-pressed="false"><svg aria-hidden="true"><use href="#icon-sun"/></svg><span>День</span></button>
+        <button class="time-button" data-phase="sunset" aria-pressed="false"><svg aria-hidden="true"><use href="#icon-sunset"/></svg><span>Закат</span></button>
+        <button class="time-button" data-phase="night" aria-pressed="false"><svg aria-hidden="true"><use href="#icon-moon"/></svg><span>Ночь</span></button>
+      </nav>
+      <div class="scene-controls">
+        <button class="icon-button glass" id="prevPhase" aria-label="Предыдущее время суток"><svg class="reversed" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+        <button class="play-toggle glass" id="playToggle" aria-pressed="false"><span class="play-symbol" aria-hidden="true"></span><span id="playLabel">Пауза</span></button>
+        <button class="icon-button glass" id="nextPhase" aria-label="Следующее время суток"><svg aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+      </div>
+      <div class="footer-line"><span>ОДИН ПАБ. ОТ РАССВЕТА ДО НОЧИ.</span><button id="zoom"><svg aria-hidden="true"><use href="#icon-expand"/></svg>Рассмотреть паб</button></div>
+      <div class="scene-progress" id="sceneProgress" aria-hidden="true"></div>
+    </footer>
+  </main>
+  <dialog id="about" class="about-dialog" aria-labelledby="aboutTitle">
+    <div class="about-modal-header">
+      <h2 id="aboutTitle">О нас</h2>
+      <button class="dialog-close" type="button" data-close-about aria-label="Закрыть окно «О нас»">×</button>
+    </div>
+    <div class="about-content">
+      <div class="about-story">
+        <p class="about-lead">Привозим атмосферу <strong>настоящего ирландского паба</strong> на вашу площадку.</p>
+        <p class="about-copy"><span class="about-services">Фургон, оборудование, персонал и напитки —</span><br>
+готовое event-решение под ключ для частных праздников, корпоративов и фестивалей.</p>
+      </div>
+      <figure class="about-media" aria-label="Видео о пабе">
+        <div class="video-frame" id="aboutVideoFrame">
+          <video class="about-video" id="aboutVideo" width="640" height="360" data-src="media/about.mp4" autoplay muted loop playsinline controls preload="none" aria-label="Видео о мобильном пабе" hidden></video>
+          <div class="video-placeholder" id="aboutVideoPlaceholder">
+            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="8" width="30" height="24" rx="4"/><path d="M12 8v24M28 8v24M5 15h7M5 25h7M28 15h7M28 25h7"/></svg>
+            <p>Видео о пабе</p>
+            <span>Скоро здесь</span>
+          </div>
+          <div class="video-manual" id="aboutVideoManual" hidden>
+            <button class="primary-button" id="aboutVideoPlay" type="button">Воспроизвести</button>
+          </div>
+        </div>
+      </figure>
+      <button class="primary-button dialog-action" type="button" data-close-about>Вернуться к пабу</button>
+    </div>
+  </dialog>
+  <dialog id="lightbox" class="lightbox" aria-label="Мобильный паб — крупный план">
+    <button class="dialog-close" id="closeZoom" aria-label="Закрыть изображение">×</button>
+    <picture><source id="zoomSource" media="(max-width: 700px)" srcset="courtyard-morning-busy-mobile.webp"><img id="zoomImage" src="courtyard-morning-busy.webp" alt="Мобильный паб на парковке со столиками-бочками, обогревателями и гостями утром"></picture>
+  </dialog>
+  <script src="app.js?v=all-busy"></script>
+  <script src="about-video.js?v=glass-modal-video"></script>
+</body>
+</html>
