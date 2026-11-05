@@ -101,7 +101,8 @@
     const controller = new AbortController();
     probe = controller;
     try {
-      const exists = await sourceExists(source, controller.signal);
+      const exists = /^https?:\/\//i.test(source)
+         await sourceExists(source, controller.signal);
       if (!exists || controller.signal.aborted || currentSession !== session || !active || !dialog.open) return;
       attached = true;
       video.src = source;
