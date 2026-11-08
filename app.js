@@ -15,17 +15,16 @@
   const note = document.querySelector('#phaseNote');
   const count = document.querySelector('#sceneCount');
   const progress = document.querySelector('#sceneProgress');
-  const playToggle = document.querySelector('#playToggle');
-  const playLabel = document.querySelector('#playLabel');
-  const about = document.querySelector('#about');
+  const inquiry = document.querySelector('#inquiry');
   const lightbox = document.querySelector('#lightbox');
+  const navigation = document.querySelector('#serviceMenu');
   const canvas = document.querySelector('#ambient');
   const context = canvas?.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = matchMedia('(pointer: fine)');
-  const duration = 10000;
+  const media = window.ToDublinMedia;
+  const duration = 5000;
   let index = Math.max(0, phases.findIndex(phase => phase.id === document.body.dataset.phase));
-  let paused = reduce.matches;
   let elapsed = 0;
   let frame = 0;
   let lastFrame = 0;
@@ -33,15 +32,26 @@
   let width = 1;
   let height = 1;
   let particles = [];
-  let gestureLockedUntil = 0;
-  let wheelTotal = 0;
-  let lastWheel = 0;
-  let touchStart = null;
+  let heroVisible = true;
+  let pageReady = document.readyState === 'complete';
+  let phaseRequest = 0;
+  let pendingPhase = null;
 
   const isInteractive = target => Boolean(target?.closest?.('button, a, input, textarea, select, summary, [contenteditable], dialog'));
-  const modalOpen = () => Boolean(about?.open || lightbox?.open);
-  const canRun = () => !paused && !document.hidden && !modalOpen();
+  const modalOpen = () => Boolean(lightbox?.open || inquiry?.open || navigation?.open);
+  const canRun = () => heroVisible && !reduce.matches && !document.hidden && !modalOpen();
   const random = (min, max) => min + Math.random() * (max - min);
+
+  function warmNextScene() {
+    if (!media || !pageReady || !canRun()) return;
+    requestAnimationFrame(() => {
+      const warm = () => {
+        if (canRun()) media.ensureScene(scenes[(index + 1) % scenes.length], 'low');
+      };
+      if (window.requestIdleCallback) window.requestIdleCallback(warm, { timeout: 1000 });
+      else setTimeout(warm, 150);
+    });
+  }
 
   function makeParticles() {
     const small = width < 700;
@@ -143,10 +153,21 @@
     drawAmbient(0);
   }
 
-  function changePhase(next) {
-    renderPhase(next);
-    gestureLockedUntil = performance.now() + 900;
-    wheelTotal = 0;
+  function changePhase(next, priority = 'high') {
+    const target = (next + phases.length) % phases.length;
+    const request = ++phaseRequest;
+    if (!media) { renderPhase(target); return; }
+    pendingPhase = target;
+    media.ensureScene(scenes[target], priority).then(ready => {
+      if (request !== phaseRequest) return;
+      pendingPhase = null;
+      if (ready) { renderPhase(target); warmNextScene(); }
+      else {
+        // Keep the previous scene rather than crossfading to an empty image.
+        elapsed = 0; updateProgress();
+        if (note) note.textContent = 'Сцена не загрузилась. Попробуйте выбрать её ещё раз.';
+      }
+    });
   }
 
   function tick(timestamp) {
@@ -156,17 +177,14 @@
     lastFrame = timestamp;
     ambientTime += delta;
     elapsed += delta * 1000;
-    if (elapsed >= duration) renderPhase(index + 1);
+    if (elapsed >= duration && pendingPhase === null) changePhase(index + 1, 'low');
     drawAmbient(delta);
     updateProgress();
     frame = requestAnimationFrame(tick);
   }
 
-  function renderPause() {
-    document.body.classList.toggle('is-paused', paused);
-    playToggle?.setAttribute('aria-pressed', String(paused));
-    playToggle?.setAttribute('aria-label', paused ? 'Продолжить смену времени суток и анимацию' : 'Остановить смену времени суток и анимацию');
-    if (playLabel) playLabel.textContent = paused ? 'Продолжить' : 'Пауза';
+  function renderMotionPreference() {
+    document.body.classList.toggle('is-paused', reduce.matches);
     syncLoop();
   }
 
@@ -174,53 +192,14 @@
     const next = phases.findIndex(phase => phase.id === button.dataset.phase);
     if (next !== -1) changePhase(next);
   }));
-  document.querySelector('#prevPhase')?.addEventListener('click', () => changePhase(index - 1));
-  document.querySelector('#nextPhase')?.addEventListener('click', () => changePhase(index + 1));
-  playToggle?.addEventListener('click', () => {
-    paused = !paused;
-    renderPause();
-  });
 
-  experience.addEventListener('wheel', event => {
-    if (modalOpen() || isInteractive(event.target) || event.ctrlKey || event.metaKey) return;
-    const now = performance.now();
-    if (now < gestureLockedUntil) return;
-    const raw = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
-    if (!raw) return;
-    const delta = raw * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? height : 1);
-    if (event.cancelable) event.preventDefault();
-    if (now - lastWheel > 300 || Math.sign(delta) !== Math.sign(wheelTotal)) wheelTotal = 0;
-    lastWheel = now;
-    wheelTotal += delta;
-    if (Math.abs(wheelTotal) >= 80) changePhase(index + Math.sign(wheelTotal));
-  }, { passive: false });
-
-  experience.addEventListener('touchstart', event => {
-    touchStart = !modalOpen() && !isInteractive(event.target) && event.touches.length === 1
-      ? { x: event.touches[0].clientX, y: event.touches[0].clientY }
-      : null;
-  }, { passive: true });
-  experience.addEventListener('touchend', event => {
-    if (!touchStart || modalOpen() || performance.now() < gestureLockedUntil) {
-      touchStart = null;
-      return;
-    }
-    const touch = event.changedTouches[0];
-    if (touch) {
-      const dx = touchStart.x - touch.clientX;
-      const dy = touchStart.y - touch.clientY;
-      const distance = Math.abs(dx) > Math.abs(dy) ? dx : dy;
-      if (Math.abs(distance) >= 55) changePhase(index + Math.sign(distance));
-    }
-    touchStart = null;
-  }, { passive: true });
-  experience.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
-  document.addEventListener('keydown', event => {
+  // Vertical input always scrolls the document. Horizontal keys are scoped to the hero.
+  experience.addEventListener('keydown', event => {
     if (modalOpen() || isInteractive(event.target) || event.altKey || event.ctrlKey || event.metaKey) return;
-    const direction = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+    const direction = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
     if (direction) {
       event.preventDefault();
-      if (performance.now() >= gestureLockedUntil) changePhase(index + direction);
+      changePhase(index + direction);
     }
   });
 
@@ -229,22 +208,20 @@
     dialog.showModal();
     syncLoop();
   }
-  document.querySelectorAll('[data-open-about]').forEach(button => button.addEventListener('click', () => openDialog(about)));
-  document.querySelectorAll('[data-close-about]').forEach(button => button.addEventListener('click', () => about?.close()));
   document.querySelector('#zoom')?.addEventListener('click', () => {
     const phase = phases[index];
     const image = document.querySelector('#zoomImage');
     const source = document.querySelector('#zoomSource');
     const sceneFile = `courtyard-${phase.id}-busy`;
-    if (source) source.srcset = `${sceneFile}-mobile.webp`;
+    if (source) source.srcset = `${sceneFile}-mobile.webp?v=${phase.id === 'night' ? 'night-party-4' : 'four-barrels-2'}`;
     if (image) {
-      image.src = `${sceneFile}.webp`;
+      image.src = `${sceneFile}.webp?v=four-barrels-2`;
       image.alt = `Мобильный паб со столиками-бочками, обогревателями и гостями — ${phase.name.toLowerCase()}`;
     }
     openDialog(lightbox);
   });
   document.querySelector('#closeZoom')?.addEventListener('click', () => lightbox?.close());
-  [about, lightbox].filter(Boolean).forEach(dialog => {
+  [lightbox, inquiry].filter(Boolean).forEach(dialog => {
     dialog.addEventListener('close', syncLoop);
     dialog.addEventListener('click', event => {
       if (event.target !== dialog) return;
@@ -253,8 +230,30 @@
     });
   });
 
+  [lightbox, inquiry, navigation].filter(Boolean).forEach(dialog => {
+    if (typeof MutationObserver !== 'undefined') new MutationObserver(syncLoop).observe(dialog, { attributes: true, attributeFilter: ['open'] });
+    dialog.addEventListener('toggle', syncLoop);
+    dialog.addEventListener('close', syncLoop);
+  });
+
+  function syncVisibility() {
+    const bounds = experience.getBoundingClientRect();
+    heroVisible = bounds.bottom > 0 && bounds.top < window.innerHeight;
+    syncLoop();
+    if (heroVisible) warmNextScene();
+  }
+  if (typeof IntersectionObserver !== 'undefined') {
+    new IntersectionObserver(entries => {
+      heroVisible = entries.some(entry => entry.target === experience && entry.isIntersecting);
+      syncLoop();
+      if (heroVisible) warmNextScene();
+    }, { threshold: 0 }).observe(experience);
+  } else {
+    window.addEventListener('scroll', syncVisibility, { passive: true });
+  }
+
   experience.addEventListener('pointermove', event => {
-    if (!finePointer.matches || reduce.matches || paused || modalOpen() || event.pointerType === 'touch') return;
+    if (!finePointer.matches || reduce.matches || modalOpen() || event.pointerType === 'touch') return;
     const bounds = experience.getBoundingClientRect();
     experience.style.setProperty('--look-x', `${((event.clientX - bounds.left) / bounds.width - .5) * 10}px`);
     experience.style.setProperty('--look-y', `${((event.clientY - bounds.top) / bounds.height - .5) * 8}px`);
@@ -264,16 +263,18 @@
     experience.style.setProperty('--look-y', '0px');
   }
   experience.addEventListener('pointerleave', resetLook, { passive: true });
-  document.addEventListener('visibilitychange', syncLoop);
+  document.addEventListener('visibilitychange', () => { syncLoop(); warmNextScene(); });
+  window.addEventListener('load', () => { pageReady = true; warmNextScene(); }, { once: true });
   window.addEventListener('resize', resizeAmbient, { passive: true });
   reduce.addEventListener('change', () => {
-    if (reduce.matches) paused = true;
     resetLook();
     drawAmbient(0);
-    renderPause();
+    renderMotionPreference();
   });
 
   resizeAmbient();
+  syncVisibility();
   renderPhase(index);
-  renderPause();
+  renderMotionPreference();
+  if (pageReady) warmNextScene();
 })();

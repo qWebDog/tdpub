@@ -1,0 +1,51 @@
+/* A single native document: the original scene, then the pub information. */
+html.unified-document{height:auto;min-height:100%;overflow-x:clip;overflow-y:auto;scroll-behavior:smooth;overscroll-behavior-y:auto}
+body.unified-page{height:auto;min-height:100vh;overflow:visible;overscroll-behavior-y:auto}
+.unified-page .unified-main,.unified-page .unified-main.service-flow{width:100%;margin:0;padding:0 0 32px}
+.unified-main>.experience{position:relative;inset:auto;width:100%;height:100vh;height:100svh;min-height:520px;touch-action:auto;overflow:hidden}
+.unified-page .time-scene{transition:opacity .75s var(--ease),visibility .75s}
+.unified-main>section:not(.experience){width:min(1140px,calc(100% - 64px));margin-right:auto;margin-left:auto}
+.unified-main>.service-area,.unified-main>.service-faq{max-width:none}
+.unified-main>.service-area>*{max-width:780px}
+.unified-main>.service-faq>*{max-width:850px}
+.unified-page .service-nav{position:fixed;top:0;left:50%;z-index:10;transform:translateX(-50%);padding:16px 0;background:transparent;border-color:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;animation:none;transition:background-color .3s,border-color .3s}
+.unified-page .service-nav .service-brand{visibility:hidden}
+.unified-page.is-information-visible .service-nav{background:#10251deb;border-color:#fff9ec22;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.unified-page.is-information-visible .service-nav .service-brand{visibility:visible}
+.unified-page .service-menu-toggle{background:#0b1e1780;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.unified-page .service-bottom-actions{display:none}
+.unified-page.service-flow-active.is-information-visible .service-bottom-actions{display:grid}
+.unified-page .hero-scroll-link{pointer-events:auto;color:#D4A24C;text-decoration:none;min-width:44px;min-height:44px;padding:4px 12px;font-size:10px;letter-spacing:.12em}
+.unified-page .hero-scroll-link .scroll-mark{background:linear-gradient(transparent,#D4A24C)}
+.unified-page .scene-footer{gap:18px 30px}
+.unified-page .service-final{scroll-margin-bottom:100px}
+@media(max-width:850px){.unified-main>section:not(.experience){width:calc(100% - 40px)}.unified-page .service-nav{padding:10px 0}.unified-page .scene-footer{gap:18px}}
+@media(max-width:700px){.unified-page .hero-scroll-link{bottom:210px}.unified-page .scene-footer{gap:16px 10px}}
+@media(max-width:450px){.unified-main>section:not(.experience){width:calc(100% - 32px)}}
+@media(max-height:700px) and (max-width:700px){.unified-page .hero-scroll-link{display:none}}
+@media(prefers-reduced-motion:reduce){html.unified-document{scroll-behavior:auto}.unified-page .service-nav{transition:none}}
+
+/* Larger labels keep the four time choices on one row on narrow screens. */
+@media(max-width:700px){
+ .unified-page .hero-actions .primary-button{font-size:14px;min-height:48px;padding:12px 8px}
+ .unified-page .brand-subtitle{font-size:12px;letter-spacing:.14em}
+ .unified-page .time-button{flex-direction:column;gap:5px;min-height:56px;min-width:0;padding:8px 4px;font-size:12px;line-height:1.4}
+ .unified-page .scene-info{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;width:100%}
+ .unified-page .scene-info>div{grid-column:1;grid-row:1;min-width:0}
+ .unified-page .scene-count{grid-column:2;grid-row:1;align-self:center;padding:0;font-size:12px;letter-spacing:.04em}
+ .unified-page .scene-info h2{font-size:22px}
+ .unified-page .scene-info p{font-size:13px;line-height:1.5;margin-top:5px;color:#fff9ecd1}
+ .unified-page .scene-footer{gap:14px 10px}
+ .unified-page .footer-line{flex-wrap:wrap;justify-content:center;gap:8px 14px;font-size:10px;line-height:1.5;letter-spacing:.06em;text-align:center;color:#fff9ecb8}
+ .unified-page .footer-line button{min-height:36px;font-size:12px;letter-spacing:0}
+ .unified-page .hero-scroll-link{bottom:260px;font-size:12px;letter-spacing:.08em}
+ .unified-page .field-label{font-size:14px}
+ .unified-page .field-label span{font-size:12px}
+ .unified-page .event-option span{font-size:13px;min-height:48px}
+ .unified-page .field-error,.unified-page .inquiry-footnote,.unified-page .inquiry-status{font-size:12px;line-height:1.6}
+ .unified-page .inquiry-heading p{font-size:14px;line-height:1.6}
+ .unified-page .inquiry-telegram-note{font-size:13px;line-height:1.65}
+ .unified-page .inquiry-form-actions .primary-button{font-size:14px;min-height:48px}
+ .unified-page .inquiry-result-actions .quiet-button{font-size:12px}
+ .unified-page .service-eyebrow{font-size:12px}
+}

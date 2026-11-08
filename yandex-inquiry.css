@@ -1,0 +1,13 @@
+.inquiry-dialog.is-yandex-form{width:min(720px,calc(100% - 24px));height:min(900px,calc(100vh - 24px));height:min(900px,calc(100dvh - 24px));max-height:calc(100dvh - 24px)}
+.is-yandex-form .inquiry-content{display:flex;flex:1;min-height:0;padding:20px 24px 12px;overflow:hidden}
+.inquiry-embedded{display:flex;flex:1;min-width:0;min-height:0;flex-direction:column;gap:10px}
+.inquiry-embedded-title{margin:0;font:400 28px/1.25 Georgia,'Times New Roman',serif}
+.inquiry-embedded-title:focus{outline:none}
+.inquiry-embedded-intro{margin:0;color:#fff9ecbd;font-size:14px;line-height:1.6}
+.inquiry-embedded-frame{display:block;flex:1;min-height:180px;width:100%;border:1px solid #fff9ec1f;border-radius:10px;background:#1b1c1f;color-scheme:dark}
+.inquiry-embedded-status{margin:0;color:#fff9ec99;font-size:12px;line-height:1.5}
+.inquiry-embedded-separate{display:inline-flex;align-items:center;align-self:center;min-height:32px;color:#dfb970;font-size:12px;text-decoration:none;text-underline-offset:4px}
+.inquiry-embedded-separate:hover{text-decoration:underline}
+.inquiry-embedded .legal-links{margin-top:-8px}
+@media(max-width:700px){.is-yandex-form .inquiry-content{padding:14px 12px 8px}.inquiry-embedded-title{font-size:26px}.inquiry-embedded-intro{font-size:14px}.inquiry-embedded{gap:8px}.inquiry-embedded .legal-links a{min-height:32px}}
+@media(max-height:500px){.inquiry-embedded-intro{display:none}.inquiry-embedded-frame{min-height:90px}.inquiry-embedded-title{font-size:22px}.inquiry-embedded .legal-links{display:none}}
