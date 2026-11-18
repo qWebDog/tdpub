@@ -1,22 +1,13 @@
 (() => {
   'use strict';
 
-  const phases = [
-    { id: 'morning', time: '07:00', name: 'Раннее утро', note: 'Мягкий свет. Новый день.' },
-    { id: 'day', time: '13:00', name: 'Солнечный день', note: 'Ясное небо. Встречи без спешки.' },
-    { id: 'sunset', time: '19:30', name: 'Золотой закат', note: 'Тёплый свет. Долгие разговоры.' },
-    { id: 'night', time: '23:00', name: 'Тёплая ночь', note: 'Огни гирлянд. Своя компания.' }
-  ];
+  const phases = ['morning', 'day', 'sunset', 'night'].map(id => ({ id }));
   const experience = document.querySelector('#experience');
   if (!experience) return;
   const scenes = [...document.querySelectorAll('.time-scene')];
   const buttons = [...document.querySelectorAll('.time-button')];
-  const name = document.querySelector('#phaseName');
-  const note = document.querySelector('#phaseNote');
-  const count = document.querySelector('#sceneCount');
-  const progress = document.querySelector('#sceneProgress');
+  const status = document.querySelector('#sceneStatus');
   const inquiry = document.querySelector('#inquiry');
-  const lightbox = document.querySelector('#lightbox');
   const navigation = document.querySelector('#serviceMenu');
   const canvas = document.querySelector('#ambient');
   const context = canvas?.getContext('2d');
@@ -38,7 +29,7 @@
   let pendingPhase = null;
 
   const isInteractive = target => Boolean(target?.closest?.('button, a, input, textarea, select, summary, [contenteditable], dialog'));
-  const modalOpen = () => Boolean(lightbox?.open || inquiry?.open || navigation?.open);
+  const modalOpen = () => Boolean(inquiry?.open || navigation?.open);
   const canRun = () => heroVisible && !reduce.matches && !document.hidden && !modalOpen();
   const random = (min, max) => min + Math.random() * (max - min);
 
@@ -113,10 +104,6 @@
     drawAmbient(0);
   }
 
-  function updateProgress() {
-    progress?.style.setProperty('--progress', String(Math.min(elapsed / duration, 1)));
-  }
-
   function syncLoop() {
     if (canRun()) {
       if (!frame) {
@@ -144,11 +131,8 @@
       button.classList.toggle('is-active', selected);
       button.setAttribute('aria-pressed', String(selected));
     });
-    if (name) name.textContent = phase.name;
-    if (note) note.textContent = phase.note;
-    if (count) count.textContent = phase.time;
+    if (status) status.textContent = '';
     elapsed = 0;
-    updateProgress();
     makeParticles();
     drawAmbient(0);
   }
@@ -164,8 +148,8 @@
       if (ready) { renderPhase(target); warmNextScene(); }
       else {
         // Keep the previous scene rather than crossfading to an empty image.
-        elapsed = 0; updateProgress();
-        if (note) note.textContent = 'Сцена не загрузилась. Попробуйте выбрать её ещё раз.';
+        elapsed = 0;
+        if (status) status.textContent = 'Сцена не загрузилась. Попробуйте выбрать её ещё раз.';
       }
     });
   }
@@ -179,7 +163,6 @@
     elapsed += delta * 1000;
     if (elapsed >= duration && pendingPhase === null) changePhase(index + 1, 'low');
     drawAmbient(delta);
-    updateProgress();
     frame = requestAnimationFrame(tick);
   }
 
@@ -203,25 +186,7 @@
     }
   });
 
-  function openDialog(dialog) {
-    if (!dialog || dialog.open) return;
-    dialog.showModal();
-    syncLoop();
-  }
-  document.querySelector('#zoom')?.addEventListener('click', () => {
-    const phase = phases[index];
-    const image = document.querySelector('#zoomImage');
-    const source = document.querySelector('#zoomSource');
-    const sceneFile = `courtyard-${phase.id}-busy`;
-    if (source) source.srcset = `${sceneFile}-mobile.webp?v=${phase.id === 'night' ? 'night-party-4' : 'four-barrels-2'}`;
-    if (image) {
-      image.src = `${sceneFile}.webp?v=four-barrels-2`;
-      image.alt = `Мобильный паб со столиками-бочками, обогревателями и гостями — ${phase.name.toLowerCase()}`;
-    }
-    openDialog(lightbox);
-  });
-  document.querySelector('#closeZoom')?.addEventListener('click', () => lightbox?.close());
-  [lightbox, inquiry].filter(Boolean).forEach(dialog => {
+  [inquiry].filter(Boolean).forEach(dialog => {
     dialog.addEventListener('close', syncLoop);
     dialog.addEventListener('click', event => {
       if (event.target !== dialog) return;
@@ -230,7 +195,7 @@
     });
   });
 
-  [lightbox, inquiry, navigation].filter(Boolean).forEach(dialog => {
+  [inquiry, navigation].filter(Boolean).forEach(dialog => {
     if (typeof MutationObserver !== 'undefined') new MutationObserver(syncLoop).observe(dialog, { attributes: true, attributeFilter: ['open'] });
     dialog.addEventListener('toggle', syncLoop);
     dialog.addEventListener('close', syncLoop);
