@@ -79,7 +79,7 @@
     root.style.setProperty('--service-nav-height', headerHeight + 'px');
     queueRender();
   }
-  const revealItems = [...main.querySelectorAll('.service-intro > div, .service-video, .service-section > .service-eyebrow, .service-section > h2, .service-section > p:not(.service-eyebrow), .service-cards > article, .service-inclusions > div, .service-process > li, .service-faq > details, .service-final > h2, .service-final > p')];
+  const revealItems = [...main.querySelectorAll('.service-intro > div, .service-video, .service-section > .service-eyebrow, .service-section > h2, .service-section > p:not(.service-eyebrow), .service-cards > article, .service-inclusions > div, .package-offer, .service-process > li, .service-faq > details, .service-final > h2, .service-final > p')];
   let revealObserver = null;
   function reveal(item) {
     item.classList.remove('is-pending'); item.classList.add('is-visible');
