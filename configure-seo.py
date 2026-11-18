@@ -17,7 +17,7 @@ for name,path in [('index.html','')]:
  page=root/name;s=page.read_text()
  s=re.sub(r'\s*<link rel="canonical"[^>]*>','',s)
  s=re.sub(r'\s*<meta (?:property|name)="(?:og:url|og:image(?::(?:alt|type|width|height|secure_url))?|twitter:image(?::alt)?)"[^>]*>','',s)
- image=base+'social-preview.jpg?v=hero-rebuild-1'
+ image=base+'social-preview.jpg?v=night-lights-1'
  tags=f'''  <link rel="canonical" href="{escape(base+path,quote=True)}">
   <meta property="og:url" content="{escape(base+path,quote=True)}">
   <meta property="og:image" content="{escape(image,quote=True)}">
