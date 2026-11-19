@@ -1,5 +1,4 @@
 @font-face{font-family:Prata;font-style:normal;font-weight:400;font-display:swap;src:url('fonts/prata-regular.woff') format('woff')}
-500;600;700&family=Prata&display=swap');
     #td-configurator-request{--td-bg:#10251d;--td-panel:#183428;--td-input:#0b2118;--td-ink:#fff9ec;--td-muted:#c0cbc0;--td-gold:#d4a24c;--td-line:#fff9ec24;color-scheme:dark;font-family:Manrope,Arial,sans-serif;color:var(--td-ink);width:100%}
     #td-configurator-request *{box-sizing:border-box}
     #td-configurator-request [hidden]{display:none!important}
@@ -92,7 +91,7 @@
     @media(max-width:370px){#td-configurator-request .td-product{padding:16px 18px 20px}#td-configurator-request .td-specs{grid-template-columns:minmax(0,1fr);gap:10px}#td-configurator-request h2{font-size:27px}#td-configurator-request .td-base-price{font-size:32px}#td-configurator-request .td-price-note{margin-left:8px}#td-configurator-request .td-field{column-gap:10px}#td-configurator-request .td-step-button{width:44px}#td-configurator-request .td-remove{min-width:110px}}
     @media(max-width:620px){#td-configurator-request .td-request-grid{grid-template-columns:minmax(0,1fr);gap:18px}}
     @media(prefers-reduced-motion:reduce){#td-configurator-request *{transition:none!important}}
-#td-configurator-request{max-width:960px;margin-inline:auto}
+#td-configurator-request{max-width:736px;margin-inline:auto}
 #td-configurator-request button:disabled,#td-configurator-request .td-request-form :disabled{cursor:not-allowed}
 @media(max-width:620px){#td-configurator-request .td-product{padding-inline:0}}
 
