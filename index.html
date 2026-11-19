@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="cookie-notice.css?v=1">
   <link rel="stylesheet" href="legal.css?v=1">
   <link rel="stylesheet" href="unified.css?v=lighting-quality-6">
-  <link rel="stylesheet" href="package-offer.css?v=yandex-test-1">
+  <link rel="stylesheet" href="package-offer.css?v=telegram-chat-1">
   <meta property="og:image" content="https://qwebdog.github.io/tdpub/social-preview.jpg?v=night-lights-1">
   <meta property="og:image:secure_url" content="https://qwebdog.github.io/tdpub/social-preview.jpg?v=night-lights-1">
   <meta property="og:image:type" content="image/jpeg">
@@ -73,7 +73,7 @@
       <p class="brand-subtitle">мобильный паб</p>
       <div class="hero-actions">
         <a class="primary-button about-link" href="#overview">О нас</a>
-        <button class="primary-button invite-link" type="button" data-open-inquiry>Пригласить паб</button>
+        <a class="primary-button invite-link" href="https://t.me/qwebdog" target="_blank" rel="noopener noreferrer" aria-label="Пригласить паб — открыть чат в Telegram">Пригласить паб</a>
       </div>
     </div>
     <footer class="scene-footer">
@@ -179,7 +179,7 @@
   <line x1="8" x2="8" y1="10" y2="14" />
   <line x1="16" x2="16" y1="18" y2="22" />
 </svg><span id="td-configure-label">Настроить</span></button>
-      <button class="td-request-button cursor-interaction" id="td-request-base" type="button" aria-controls="td-request-panel">Отправить заявку</button>
+      <a class="td-request-button cursor-interaction" id="td-request-base" href="https://t.me/qwebdog" target="_blank" rel="noopener noreferrer">Обсудить в Telegram</a>
       <p class="td-selected-summary" id="td-selected-summary" role="status" aria-live="polite" hidden></p>
     </div>
     <section class="td-builder" id="td-builder-panel" aria-labelledby="td-builder-heading" hidden>
@@ -259,82 +259,13 @@
             <div id="td-barrels-row" hidden><dt id="td-removed-label">Убрано бочек: 0</dt><dd id="td-barrels-saving">0 ₽</dd></div>
             <div id="td-kegs-row" hidden><dt id="td-kegs-label">Дополнительные кеги</dt><dd id="td-kegs-charge">0 ₽</dd></div>
           </dl>
-          <button class="td-request-button cursor-interaction" id="td-request-open" type="button" aria-controls="td-request-panel">Отправить заявку</button>
+          <a class="td-request-button cursor-interaction" id="td-request-open" href="https://t.me/qwebdog" target="_blank" rel="noopener noreferrer">Обсудить в Telegram</a>
         </aside>
       </div>
     </section>
     <p class="td-day-note">Многодневные мероприятия обсуждаем отдельно.</p>
     </div>
-    <section id="td-request-panel" aria-labelledby="td-request-title" aria-describedby="td-preview-note" hidden>
-      <header class="td-request-heading">
-        <h3 class="td-request-title" id="td-request-title">Связаться с to Dublin</h3>
-        <button class="td-back cursor-interaction" id="td-request-back" type="button">Назад</button>
-      </header>
-      <p class="td-preview-note" id="td-preview-note">Макет формы — ввод данных и отправка пока отключены.</p>
-      <fieldset class="td-purpose" id="td-request-purpose-fields">
-        <legend class="td-purpose-label">Тема обращения</legend>
-        <div class="td-purpose-options">
-          <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-event" data-request-purpose="event" type="button" aria-pressed="true">Мероприятие</button>
-          <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-festival" data-request-purpose="festival" type="button" aria-pressed="false">Фестиваль</button>
-          <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-partnership" data-request-purpose="partnership" type="button" aria-pressed="false">Сотрудничество</button>
-          <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-other" data-request-purpose="other" type="button" aria-pressed="false">Другой вопрос</button>
-        </div>
-      </fieldset>
-      <div class="td-attach-control" id="td-attach-control">
-        <label class="td-attach-label cursor-interaction" for="td-request-attach">
-          <input id="td-request-attach" type="checkbox" aria-controls="td-request-summary" aria-describedby="td-attach-error">
-          <span>Приложить состав и расчёт</span>
-        </label>
-        <button class="td-back cursor-interaction" id="td-request-edit" type="button" hidden>Изменить расчёт</button>
-        <p class="td-attach-error" id="td-attach-error" role="alert" hidden>Исправьте ошибки в расчёте или снимите отметку, чтобы обратиться без него.</p>
-      </div>
-      <div class="td-request-grid" id="td-request-grid">
-        <aside class="td-request-summary" id="td-request-summary" aria-label="Выбранный состав и стоимость" hidden>
-          <p class="td-quote-label">Ваше мероприятие</p>
-          <output class="td-total" id="td-request-total" aria-live="polite">150 000 ₽</output>
-          <p class="td-duration" id="td-request-duration">Всего 8 часов</p>
-          <dl class="td-selection">
-            <div><dt>Генератор</dt><dd id="td-request-generator">7 кВт</dd></div>
-            <div><dt>Столы-бочки</dt><dd id="td-request-barrels">7 из 7</dd></div>
-            <div><dt>Пиво</dt><dd id="td-request-kegs">1 кег · Black Sheep Irish Stout</dd></div>
-          </dl>
-          <p class="td-selection-note">Фургон to Dublin, бармен, уличное освещение и доставка в пределах 5 км от МКАД включены.</p>
-        </aside>
-        <section class="td-yandex-panel" id="td-yandex-panel" aria-label="Тестовое заполнение Яндекс Формы" hidden>
-          <button class="td-request-button" id="td-yandex-start" type="button">Заполнить тестовую заявку</button>
-          <p class="td-yandex-status" id="td-yandex-status" role="status" aria-live="polite" hidden></p>
-          <div id="td-yandex-stage" hidden>
-            <button class="td-back" id="td-yandex-change" type="button">Изменить параметры</button>
-            <p class="td-yandex-note">При возврате к параметрам заполнение тестовой формы начнётся заново.</p>
-            <iframe class="td-yandex-frame" id="td-yandex-frame" title="Тестовая заявка to Dublin — Яндекс Формы" referrerpolicy="no-referrer"></iframe>
-            <a class="td-yandex-external" id="td-yandex-external" target="_blank" rel="noopener noreferrer">Открыть форму отдельно</a>
-          </div>
-        </section>
-        <form class="td-request-form" id="td-request-form" novalidate>
-          <fieldset class="td-form-fields" disabled aria-label="Неактивная форма заявки">
-            <input id="td-request-purpose" name="request_purpose" type="hidden" value="event">
-            <input id="td-request-config" name="configuration" type="hidden" disabled>
-            <label class="td-form-field" for="td-request-name">Ваше имя
-              <input class="td-form-input" id="td-request-name" name="name" type="text" autocomplete="given-name" placeholder="Как к вам обращаться" disabled>
-            </label>
-            <label class="td-form-field" for="td-request-contact">Телефон или email
-              <input class="td-form-input" id="td-request-contact" name="contact" type="text" placeholder="+7 … или name@example.ru" disabled>
-            </label>
-            <label class="td-form-field" id="td-request-date-field" for="td-request-date"><span id="td-request-date-label">Дата мероприятия, если известна</span>
-              <input class="td-form-input" id="td-request-date" name="event_date" type="date" disabled>
-            </label>
-            <label class="td-form-field" for="td-request-details"><span id="td-request-details-label">Детали мероприятия</span>
-              <textarea class="td-form-input" id="td-request-details" name="details" placeholder="Площадка, формат и число гостей" disabled></textarea>
-            </label>
-            <label class="td-consent" for="td-request-consent">
-              <input id="td-request-consent" name="consent" type="checkbox" disabled>
-              <span>Даю согласие на обработку персональных данных</span>
-            </label>
-            <button class="td-request-button" id="td-request-submit" type="submit" disabled>Отправить заявку</button>
-          </fieldset>
-        </form>
-      </div>
-    </section>
+
   </section>
   
 </div>
@@ -362,17 +293,17 @@
       <details name="faq"><summary>Что входит в кейтеринг?</summary><p>Мобильный паб, оборудование, персонал и напитки. Состав и условия согласуем под ваше событие.</p></details>
       <details name="faq" id="event-questions"><summary>Сколько стоит аренда?</summary><p>Базовая стоимость — 150&nbsp;000&nbsp;₽ за 8 часов. Продление — 15&nbsp;000&nbsp;₽ за каждый следующий час. Многодневные мероприятия обсуждаем отдельно. <a href="#package">Состав и расчёт стоимости</a>.</p></details>
       <details name="faq"><summary>Что нужно от площадки?</summary><p>Укажите город или площадку. Подъезд, размещение и условия работы паба обсудим при согласовании.</p></details>
-      <details name="faq"><summary>Как отправить заявку?</summary><p>Откройте форму и выберите тему обращения. Состав мероприятия выбирать необязательно. Пока отправка через сайт недоступна.</p></details>
+      <details name="faq"><summary>Как связаться?</summary><p>Нажмите «Пригласить паб» или «Обсудить в Telegram» — откроется наш чат. Напишите о мероприятии, приглашении на фестиваль или предложении о сотрудничестве.</p></details>
     </section>
     <section class="service-final" id="invitation">
       <h2>У вас есть повод.<br>У нас — атмосфера.</h2>
       <p>Расскажите, где и когда встречаемся.</p>
-      <button class="primary-button" type="button" data-open-inquiry>Пригласить to Dublin</button>
+      <a class="primary-button" href="https://t.me/qwebdog" target="_blank" rel="noopener noreferrer" aria-label="Пригласить to Dublin — открыть чат в Telegram">Пригласить to Dublin</a>
     </section>
   </main>
   <footer class="site-legal-footer"><nav class="legal-links" aria-label="Правовая информация"><a href="privacy.html" aria-label="Политика обработки персональных данных">Политика данных</a><a href="terms.html" aria-label="Соглашение об использовании сайта и подаче заявки">Соглашение</a><a href="consent.html" aria-label="Согласие на обработку персональных данных">Согласие</a></nav></footer>
   <div class="service-bottom-actions">
-    <button class="primary-button service-invite-button" type="button" data-open-inquiry>Пригласить паб</button>
+    <a class="primary-button service-invite-button" href="https://t.me/qwebdog" target="_blank" rel="noopener noreferrer" aria-label="Пригласить паб — открыть чат в Telegram">Пригласить паб</a>
   </div>
   <dialog id="serviceMenu" class="service-menu" aria-labelledby="serviceMenuTitle">
     <div class="service-menu-heading">
@@ -393,9 +324,7 @@
   </dialog>
   <script src="media-loader.js?v=1"></script>
   <script src="app.js?v=clean-hero-12"></script>
-  <script src="inquiry-config.js?v=yandex-test-1"></script>
-  <script src="package-inquiry-yandex.js?v=yandex-test-1"></script>
-  <script src="package-offer.js?v=yandex-test-1"></script>
+  <script src="package-offer.js?v=telegram-chat-1"></script>
   <script src="service-panels.js?v=full-package-1"></script>
   <script src="cookie-notice.js?v=1"></script>
 </body>

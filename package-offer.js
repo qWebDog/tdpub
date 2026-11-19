@@ -15,24 +15,9 @@
         generatorRow:get('td-generator-row'), barrelRow:get('td-barrels-row'), hourRow:get('td-hours-row'), kegRow:get('td-kegs-row'),
         removedLabel:get('td-removed-label'), barrelSaving:get('td-barrels-saving'), extensionLabel:get('td-extension-label'), hourCharge:get('td-hours-charge'),
         kegLabel:get('td-kegs-label'), kegCharge:get('td-kegs-charge'), heading:get('td-package-heading'), baseLabel:get('td-base-label'),
-        offer:get('td-offer-panel'), requestPanel:get('td-request-panel'), requestOpen:get('td-request-open'), baseRequest:get('td-request-base'),
-        back:get('td-request-back'), requestForm:get('td-request-form'), requestConfig:get('td-request-config'),
-        requestTotal:get('td-request-total'), requestDuration:get('td-request-duration'),
-        requestGenerator:get('td-request-generator'), requestBarrels:get('td-request-barrels'), requestKegs:get('td-request-kegs'),
-        purposeInput:get('td-request-purpose'), attach:get('td-request-attach'), attachControl:get('td-attach-control'), attachError:get('td-attach-error'),
-        requestSummary:get('td-request-summary'), requestGrid:get('td-request-grid'), editRequest:get('td-request-edit'),
-        dateField:get('td-request-date-field'), dateLabel:get('td-request-date-label'),
-        detailsLabel:get('td-request-details-label'), detailsInput:get('td-request-details'),
-        previewNote:get('td-preview-note'), purposeFields:get('td-request-purpose-fields'),
-        yandexPanel:get('td-yandex-panel'), yandexStart:get('td-yandex-start'),
-        yandexStage:get('td-yandex-stage'), yandexFrame:get('td-yandex-frame'),
-        yandexStatus:get('td-yandex-status'), yandexChange:get('td-yandex-change'), yandexExternal:get('td-yandex-external')
+        baseRequest:get('td-request-base')
       };
-      const yandex = window.ToDublinYandexRequest;
-      const yandexAvailable = Boolean(yandex && yandex.isAvailable());
-      let yandexStarted = false;
       const PACKAGE_NAME = 'Мероприятие';
-      const BEER = 'Black Sheep Irish Stout';
       const MAX_EXTRA_KEGS = Math.floor((Number.MAX_SAFE_INTEGER - 390000) / 9000);
       const money = value => new Intl.NumberFormat('ru-RU', {maximumFractionDigits:0}).format(value) + ' ₽';
       function parseInteger(value) {
@@ -72,16 +57,6 @@
       }
       let state = normalize();
       let builderExpanded = false;
-      let requestOpen = yandexAvailable;
-      let requestPurpose = 'event';
-      let attachConfiguration = false;
-      const purposes = {
-        event:{date:true,dateLabel:'Дата мероприятия, если известна',detailsLabel:'Детали мероприятия',placeholder:'Площадка, формат и число гостей'},
-        festival:{date:true,dateLabel:'Дата фестиваля, если известна',detailsLabel:'Приглашение на фестиваль',placeholder:'Название фестиваля, место, даты и условия участия'},
-        partnership:{date:false,detailsLabel:'Предложение о сотрудничестве',placeholder:'Расскажите о вашем проекте, идее и условиях сотрудничества'},
-        other:{date:false,detailsLabel:'Сообщение',placeholder:'Расскажите, с чем хотите обратиться'}
-      };
-      const purposeButtons = Object.keys(purposes).map(key => ({key,button:get('td-request-purpose-' + key)}));
       const errors = {};
       const fields = {};
       const specs = {
@@ -110,25 +85,6 @@
         const f = fields[key];
         const n = parseInteger(f.input.value);
         return n !== null && n >= f.min && n <= f.max ? n : null;
-      }
-      function summary() {
-        const price = calculate(state);
-        return [
-          'to Dublin — ' + state.packageName,
-          'Включены: фургон, бармен, уличное освещение и доставка в пределах 5 км от МКАД.',
-          'Генератор 7 кВт: ' + (state.generator ? 'включён' : 'не нужен'),
-          'Столы-бочки: ' + state.barrels + ' из 7',
-          BEER + ': ' + countLabel(state.extraKegs+1, 'кег', 'кега', 'кегов') + (state.extraKegs ? ' (первый включён)' : ' — включён'),
-          'Длительность: ' + (state.multiday ? 'несколько дней' : hourLabel(8+state.extraHours)),
-          ...(!state.multiday ? [
-            'Базовая стоимость: ' + money(150000) + ' за 8 часов',
-            ...(state.extraHours ? ['Продление: ' + state.extraHours + ' ч × 15 000 ₽ = +' + money(state.extraHours*15000)] : []),
-            ...(!state.generator ? ['Без генератора: −20 000 ₽'] : []),
-            ...(state.barrels !== 7 ? ['Убрано столов-бочек: ' + (7-state.barrels) + ' × 5 000 ₽ = −' + money((7-state.barrels)*5000)] : []),
-            ...(state.extraKegs ? ['Дополнительные кеги: ' + state.extraKegs + ' × 9 000 ₽ = +' + money(state.extraKegs*9000)] : [])
-          ] : []),
-          price === null ? 'Стоимость: по согласованию' : 'Итого: ' + money(price)
-        ].join('\n');
       }
       function render(syncInputs = false) {
         Object.keys(fields).forEach(key => {
@@ -179,45 +135,7 @@
         ui.hourCharge.textContent = '+' + money(state.extraHours*15000);
         ui.kegLabel.textContent = 'Дополнительные кеги: ' + state.extraKegs;
         ui.kegCharge.textContent = '+' + money(state.extraKegs*9000);
-        ui.offer.hidden = requestOpen;
-        ui.requestPanel.hidden = !requestOpen;
         ui.baseRequest.hidden = builderExpanded;
-        ui.baseRequest.disabled = invalid;
-        ui.requestOpen.disabled = invalid;
-        ui.requestTotal.textContent = invalid ? 'Проверьте значения' : price === null ? 'По согласованию' : money(price);
-        ui.requestTotal.classList.toggle('is-negotiated', invalid || price === null);
-        ui.requestDuration.textContent = state.multiday ? 'На несколько дней' : 'Всего ' + hourLabel(8+state.extraHours);
-        ui.requestGenerator.textContent = state.generator ? '7 кВт' : 'Не нужен';
-        ui.requestBarrels.textContent = state.barrels + ' из 7';
-        ui.requestKegs.textContent = countLabel(state.extraKegs+1, 'кег', 'кега', 'кегов') + ' · ' + BEER;
-        const purpose = purposes[requestPurpose];
-        const wantsConfiguration = requestPurpose === 'event' && attachConfiguration;
-        const hasConfiguration = wantsConfiguration && !invalid;
-        purposeButtons.forEach(item => item.button.setAttribute('aria-pressed', String(item.key === requestPurpose)));
-        ui.purposeInput.value = requestPurpose;
-        ui.attach.checked = attachConfiguration;
-        ui.attachControl.hidden = requestPurpose !== 'event';
-        ui.attachError.hidden = !wantsConfiguration || !invalid;
-        ui.editRequest.hidden = !wantsConfiguration;
-        ui.requestSummary.hidden = !hasConfiguration;
-        ui.requestGrid.classList.toggle('has-configuration', hasConfiguration);
-        ui.requestConfig.value = hasConfiguration ? summary() : '';
-        ui.requestConfig.disabled = !hasConfiguration;
-        ui.dateField.hidden = !purpose.date;
-        ui.dateLabel.textContent = purpose.dateLabel || 'Дата, если известна';
-        ui.detailsLabel.textContent = purpose.detailsLabel;
-        ui.detailsInput.placeholder = purpose.placeholder;
-        ui.requestForm.hidden = yandexAvailable;
-        ui.yandexPanel.hidden = !yandexAvailable;
-        ui.requestGrid.classList.toggle('is-yandex-test', yandexAvailable);
-        ui.purposeFields.hidden = yandexStarted;
-        ui.attachControl.hidden = requestPurpose !== 'event' || yandexStarted;
-        ui.yandexStart.hidden = yandexStarted;
-        ui.yandexStart.disabled = wantsConfiguration && invalid;
-        ui.yandexStage.hidden = !yandexStarted;
-        ui.previewNote.textContent = yandexAvailable ?
-          (yandex.isTestMode() ? 'Тестовый режим. Используйте только вымышленные данные.' : 'Контакты и согласие заполните в форме ниже.') :
-          'Макет формы — ввод данных и отправка пока отключены.';
       }
       function changed() {
         render();
@@ -261,95 +179,5 @@
       }
       ui.singleDay.addEventListener('click', () => chooseDays(false));
       ui.multiDay.addEventListener('click', () => chooseDays(true));
-      function scrollToOffer() {
-        const section = document.getElementById('package');
-        const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        section?.scrollIntoView({behavior:reduced ? 'auto' : 'smooth',block:'start'});
-      }
-      function resetYandex() {
-        yandexStarted = false;
-        ui.yandexFrame.removeAttribute('src');
-        ui.yandexExternal.removeAttribute('href');
-        ui.yandexStatus.hidden = true;
-      }
-      ui.yandexStart.addEventListener('click', () => {
-        if (!yandexAvailable || (requestPurpose === 'event' && attachConfiguration && hasErrors())) return;
-        const context = {
-          purpose:requestPurpose,
-          configuration:requestPurpose === 'event' && attachConfiguration ? summary() : ''
-        };
-        const url = yandex.buildUrl(context);
-        if (!url) {
-          ui.yandexStatus.textContent = 'Не удалось открыть форму. Проверьте параметры заявки.';
-          ui.yandexStatus.hidden = false;
-          return;
-        }
-        ui.yandexStatus.textContent = 'Загружаем Яндекс Форму…';
-        ui.yandexStatus.hidden = false;
-        ui.yandexFrame.src = url;
-        ui.yandexExternal.href = yandex.buildUrl(context, false);
-        yandexStarted = true;
-        render();
-        ui.yandexChange.focus({preventScroll:true});
-      });
-      ui.yandexFrame.addEventListener('load', () => {
-        if (yandexStarted) ui.yandexStatus.hidden = true;
-      });
-      ui.yandexChange.addEventListener('click', () => {
-        resetYandex();
-        render();
-        ui.yandexStart.focus({preventScroll:true});
-      });
-      if (yandexAvailable) yandex.bindResize(ui.yandexFrame);
-      function openRequest(withConfiguration = false) {
-        if (withConfiguration && hasErrors()) return;
-        resetYandex();
-        if (withConfiguration) requestPurpose = 'event';
-        attachConfiguration = withConfiguration;
-        requestOpen = true;
-        render();
-        ui.back.focus({preventScroll:true});
-        scrollToOffer();
-      }
-      ui.requestOpen.addEventListener('click', () => openRequest(true));
-      ui.baseRequest.addEventListener('click', () => openRequest(true));
-      purposeButtons.forEach(item => {
-        item.button.addEventListener('click', () => {
-          if (yandexStarted) resetYandex();
-          requestPurpose = item.key;
-          if (requestPurpose !== 'event') attachConfiguration = false;
-          render();
-        });
-      });
-      ui.attach.addEventListener('change', () => {
-        if (yandexStarted) resetYandex();
-        attachConfiguration = requestPurpose === 'event' && ui.attach.checked;
-        render();
-      });
-      ui.editRequest.addEventListener('click', () => {
-        resetYandex();
-        requestOpen = false;
-        builderExpanded = true;
-        render();
-        const invalidKey = Object.keys(fields).find(key => errors[key]);
-        (invalidKey ? fields[invalidKey].input : ui.generatorButton).focus({preventScroll:true});
-        scrollToOffer();
-      });
-      ui.back.addEventListener('click', () => {
-        resetYandex();
-        requestOpen = false;
-        render();
-        const returnButton = builderExpanded ? ui.requestOpen : ui.baseRequest;
-        (returnButton.disabled ? ui.configure : returnButton).focus({preventScroll:true});
-        scrollToOffer();
-      });
-      document.querySelectorAll('[data-open-inquiry]').forEach(button => {
-        button.addEventListener('click', event => {
-          event.preventDefault();
-          openRequest(false);
-        });
-      });
-      ui.requestForm.addEventListener('submit', event => event.preventDefault());
       render(true);
-      if (yandexAvailable) scrollToOffer();
     })();
