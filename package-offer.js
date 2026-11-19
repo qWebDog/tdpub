@@ -18,7 +18,11 @@
         offer:get('td-offer-panel'), requestPanel:get('td-request-panel'), requestOpen:get('td-request-open'), baseRequest:get('td-request-base'),
         back:get('td-request-back'), requestForm:get('td-request-form'), requestConfig:get('td-request-config'),
         requestTotal:get('td-request-total'), requestDuration:get('td-request-duration'),
-        requestGenerator:get('td-request-generator'), requestBarrels:get('td-request-barrels'), requestKegs:get('td-request-kegs')
+        requestGenerator:get('td-request-generator'), requestBarrels:get('td-request-barrels'), requestKegs:get('td-request-kegs'),
+        purposeInput:get('td-request-purpose'), attach:get('td-request-attach'), attachControl:get('td-attach-control'), attachError:get('td-attach-error'),
+        requestSummary:get('td-request-summary'), requestGrid:get('td-request-grid'), editRequest:get('td-request-edit'),
+        dateField:get('td-request-date-field'), dateLabel:get('td-request-date-label'),
+        detailsLabel:get('td-request-details-label'), detailsInput:get('td-request-details')
       };
       const PACKAGE_NAME = 'Мероприятие';
       const BEER = 'Black Sheep Irish Stout';
@@ -62,6 +66,15 @@
       let state = normalize();
       let builderExpanded = false;
       let requestOpen = false;
+      let requestPurpose = 'event';
+      let attachConfiguration = false;
+      const purposes = {
+        event:{date:true,dateLabel:'Дата мероприятия, если известна',detailsLabel:'Детали мероприятия',placeholder:'Площадка, формат и число гостей'},
+        festival:{date:true,dateLabel:'Дата фестиваля, если известна',detailsLabel:'Приглашение на фестиваль',placeholder:'Название фестиваля, место, даты и условия участия'},
+        partnership:{date:false,detailsLabel:'Предложение о сотрудничестве',placeholder:'Расскажите о вашем проекте, идее и условиях сотрудничества'},
+        other:{date:false,detailsLabel:'Сообщение',placeholder:'Расскажите, с чем хотите обратиться'}
+      };
+      const purposeButtons = Object.keys(purposes).map(key => ({key,button:get('td-request-purpose-' + key)}));
       const errors = {};
       const fields = {};
       const specs = {
@@ -170,7 +183,23 @@
         ui.requestGenerator.textContent = state.generator ? '7 кВт' : 'Не нужен';
         ui.requestBarrels.textContent = state.barrels + ' из 7';
         ui.requestKegs.textContent = countLabel(state.extraKegs+1, 'кег', 'кега', 'кегов') + ' · ' + BEER;
-        ui.requestConfig.value = invalid ? '' : summary();
+        const purpose = purposes[requestPurpose];
+        const wantsConfiguration = requestPurpose === 'event' && attachConfiguration;
+        const hasConfiguration = wantsConfiguration && !invalid;
+        purposeButtons.forEach(item => item.button.setAttribute('aria-pressed', String(item.key === requestPurpose)));
+        ui.purposeInput.value = requestPurpose;
+        ui.attach.checked = attachConfiguration;
+        ui.attachControl.hidden = requestPurpose !== 'event';
+        ui.attachError.hidden = !wantsConfiguration || !invalid;
+        ui.editRequest.hidden = !wantsConfiguration;
+        ui.requestSummary.hidden = !hasConfiguration;
+        ui.requestGrid.classList.toggle('has-configuration', hasConfiguration);
+        ui.requestConfig.value = hasConfiguration ? summary() : '';
+        ui.requestConfig.disabled = !hasConfiguration;
+        ui.dateField.hidden = !purpose.date;
+        ui.dateLabel.textContent = purpose.dateLabel || 'Дата, если известна';
+        ui.detailsLabel.textContent = purpose.detailsLabel;
+        ui.detailsInput.placeholder = purpose.placeholder;
       }
       function changed() {
         render();
@@ -219,34 +248,47 @@
         const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         section?.scrollIntoView({behavior:reduced ? 'auto' : 'smooth',block:'start'});
       }
-      function openRequest() {
-        if (hasErrors()) return;
+      function openRequest(withConfiguration = false) {
+        if (withConfiguration && hasErrors()) return;
+        if (withConfiguration) requestPurpose = 'event';
+        attachConfiguration = withConfiguration;
         requestOpen = true;
         render();
         ui.back.focus({preventScroll:true});
         scrollToOffer();
       }
-      ui.requestOpen.addEventListener('click', openRequest);
-      ui.baseRequest.addEventListener('click', openRequest);
+      ui.requestOpen.addEventListener('click', () => openRequest(true));
+      ui.baseRequest.addEventListener('click', () => openRequest(true));
+      purposeButtons.forEach(item => {
+        item.button.addEventListener('click', () => {
+          requestPurpose = item.key;
+          if (requestPurpose !== 'event') attachConfiguration = false;
+          render();
+        });
+      });
+      ui.attach.addEventListener('change', () => {
+        attachConfiguration = requestPurpose === 'event' && ui.attach.checked;
+        render();
+      });
+      ui.editRequest.addEventListener('click', () => {
+        requestOpen = false;
+        builderExpanded = true;
+        render();
+        const invalidKey = Object.keys(fields).find(key => errors[key]);
+        (invalidKey ? fields[invalidKey].input : ui.generatorButton).focus({preventScroll:true});
+        scrollToOffer();
+      });
       ui.back.addEventListener('click', () => {
         requestOpen = false;
         render();
-        (builderExpanded ? ui.requestOpen : ui.baseRequest).focus({preventScroll:true});
+        const returnButton = builderExpanded ? ui.requestOpen : ui.baseRequest;
+        (returnButton.disabled ? ui.configure : returnButton).focus({preventScroll:true});
         scrollToOffer();
       });
       document.querySelectorAll('[data-open-inquiry]').forEach(button => {
         button.addEventListener('click', event => {
           event.preventDefault();
-          if (hasErrors()) {
-            builderExpanded = true;
-            requestOpen = false;
-            render();
-            scrollToOffer();
-            const invalidKey = Object.keys(fields).find(key => errors[key]);
-            if (invalidKey) fields[invalidKey].input.focus({preventScroll:true});
-            return;
-          }
-          openRequest();
+          openRequest(false);
         });
       });
       ui.requestForm.addEventListener('submit', event => event.preventDefault());

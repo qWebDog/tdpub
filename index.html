@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="cookie-notice.css?v=1">
   <link rel="stylesheet" href="legal.css?v=1">
   <link rel="stylesheet" href="unified.css?v=lighting-quality-6">
-  <link rel="stylesheet" href="package-offer.css?v=event-configurator-2">
+  <link rel="stylesheet" href="package-offer.css?v=general-inquiry-1">
   <meta property="og:image" content="https://qwebdog.github.io/tdpub/social-preview.jpg?v=night-lights-1">
   <meta property="og:image:secure_url" content="https://qwebdog.github.io/tdpub/social-preview.jpg?v=night-lights-1">
   <meta property="og:image:type" content="image/jpeg">
@@ -267,12 +267,29 @@
     </div>
     <section id="td-request-panel" aria-labelledby="td-request-title" aria-describedby="td-preview-note" hidden>
       <header class="td-request-heading">
-        <h3 class="td-request-title" id="td-request-title">Заявка на мероприятие</h3>
-        <button class="td-back cursor-interaction" id="td-request-back" type="button">К расчёту</button>
+        <h3 class="td-request-title" id="td-request-title">Связаться с to Dublin</h3>
+        <button class="td-back cursor-interaction" id="td-request-back" type="button">Назад</button>
       </header>
       <p class="td-preview-note" id="td-preview-note">Макет формы — ввод данных и отправка пока отключены.</p>
-      <div class="td-request-grid">
-        <aside class="td-request-summary" aria-label="Выбранный состав и стоимость">
+      <fieldset class="td-purpose">
+        <legend class="td-purpose-label">Тема обращения</legend>
+        <div class="td-purpose-options">
+          <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-event" data-request-purpose="event" type="button" aria-pressed="true">Мероприятие</button>
+          <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-festival" data-request-purpose="festival" type="button" aria-pressed="false">Фестиваль</button>
+          <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-partnership" data-request-purpose="partnership" type="button" aria-pressed="false">Сотрудничество</button>
+          <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-other" data-request-purpose="other" type="button" aria-pressed="false">Другой вопрос</button>
+        </div>
+      </fieldset>
+      <div class="td-attach-control" id="td-attach-control">
+        <label class="td-attach-label cursor-interaction" for="td-request-attach">
+          <input id="td-request-attach" type="checkbox" aria-controls="td-request-summary" aria-describedby="td-attach-error">
+          <span>Приложить состав и расчёт</span>
+        </label>
+        <button class="td-back cursor-interaction" id="td-request-edit" type="button" hidden>Изменить расчёт</button>
+        <p class="td-attach-error" id="td-attach-error" role="alert" hidden>Исправьте ошибки в расчёте или снимите отметку, чтобы обратиться без него.</p>
+      </div>
+      <div class="td-request-grid" id="td-request-grid">
+        <aside class="td-request-summary" id="td-request-summary" aria-label="Выбранный состав и стоимость" hidden>
           <p class="td-quote-label">Ваше мероприятие</p>
           <output class="td-total" id="td-request-total" aria-live="polite">150 000 ₽</output>
           <p class="td-duration" id="td-request-duration">Всего 8 часов</p>
@@ -285,17 +302,18 @@
         </aside>
         <form class="td-request-form" id="td-request-form" novalidate>
           <fieldset class="td-form-fields" disabled aria-label="Неактивная форма заявки">
-            <input id="td-request-config" name="configuration" type="hidden">
+            <input id="td-request-purpose" name="request_purpose" type="hidden" value="event">
+            <input id="td-request-config" name="configuration" type="hidden" disabled>
             <label class="td-form-field" for="td-request-name">Ваше имя
               <input class="td-form-input" id="td-request-name" name="name" type="text" autocomplete="given-name" placeholder="Как к вам обращаться" disabled>
             </label>
             <label class="td-form-field" for="td-request-contact">Телефон или email
               <input class="td-form-input" id="td-request-contact" name="contact" type="text" placeholder="+7 … или name@example.ru" disabled>
             </label>
-            <label class="td-form-field" for="td-request-date">Дата мероприятия, если известна
+            <label class="td-form-field" id="td-request-date-field" for="td-request-date"><span id="td-request-date-label">Дата мероприятия, если известна</span>
               <input class="td-form-input" id="td-request-date" name="event_date" type="date" disabled>
             </label>
-            <label class="td-form-field" for="td-request-details">Детали мероприятия
+            <label class="td-form-field" for="td-request-details"><span id="td-request-details-label">Детали мероприятия</span>
               <textarea class="td-form-input" id="td-request-details" name="details" placeholder="Площадка, формат и число гостей" disabled></textarea>
             </label>
             <label class="td-consent" for="td-request-consent">
@@ -334,7 +352,7 @@
       <details name="faq"><summary>Что входит в кейтеринг?</summary><p>Мобильный паб, оборудование, персонал и напитки. Состав и условия согласуем под ваше событие.</p></details>
       <details name="faq" id="event-questions"><summary>Сколько стоит аренда?</summary><p>Базовая стоимость — 150&nbsp;000&nbsp;₽ за 8 часов. Продление — 15&nbsp;000&nbsp;₽ за каждый следующий час. Многодневные мероприятия обсуждаем отдельно. <a href="#package">Состав и расчёт стоимости</a>.</p></details>
       <details name="faq"><summary>Что нужно от площадки?</summary><p>Укажите город или площадку. Подъезд, размещение и условия работы паба обсудим при согласовании.</p></details>
-      <details name="faq"><summary>Как отправить заявку?</summary><p>Выберите состав мероприятия и откройте форму заявки. Пока отправка через сайт недоступна.</p></details>
+      <details name="faq"><summary>Как отправить заявку?</summary><p>Откройте форму и выберите тему обращения. Состав мероприятия выбирать необязательно. Пока отправка через сайт недоступна.</p></details>
     </section>
     <section class="service-final" id="invitation">
       <h2>У вас есть повод.<br>У нас — атмосфера.</h2>
@@ -365,7 +383,7 @@
   </dialog>
   <script src="media-loader.js?v=1"></script>
   <script src="app.js?v=clean-hero-12"></script>
-  <script src="package-offer.js?v=event-configurator-1"></script>
+  <script src="package-offer.js?v=general-inquiry-1"></script>
   <script src="service-panels.js?v=full-package-1"></script>
   <script src="cookie-notice.js?v=1"></script>
 </body>
