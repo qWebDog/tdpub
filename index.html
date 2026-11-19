@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="cookie-notice.css?v=1">
   <link rel="stylesheet" href="legal.css?v=1">
   <link rel="stylesheet" href="unified.css?v=lighting-quality-6">
-  <link rel="stylesheet" href="package-offer.css?v=general-inquiry-1">
+  <link rel="stylesheet" href="package-offer.css?v=yandex-test-1">
   <meta property="og:image" content="https://qwebdog.github.io/tdpub/social-preview.jpg?v=night-lights-1">
   <meta property="og:image:secure_url" content="https://qwebdog.github.io/tdpub/social-preview.jpg?v=night-lights-1">
   <meta property="og:image:type" content="image/jpeg">
@@ -271,7 +271,7 @@
         <button class="td-back cursor-interaction" id="td-request-back" type="button">Назад</button>
       </header>
       <p class="td-preview-note" id="td-preview-note">Макет формы — ввод данных и отправка пока отключены.</p>
-      <fieldset class="td-purpose">
+      <fieldset class="td-purpose" id="td-request-purpose-fields">
         <legend class="td-purpose-label">Тема обращения</legend>
         <div class="td-purpose-options">
           <button class="td-purpose-choice cursor-interaction" id="td-request-purpose-event" data-request-purpose="event" type="button" aria-pressed="true">Мероприятие</button>
@@ -300,6 +300,16 @@
           </dl>
           <p class="td-selection-note">Фургон to Dublin, бармен, уличное освещение и доставка в пределах 5 км от МКАД включены.</p>
         </aside>
+        <section class="td-yandex-panel" id="td-yandex-panel" aria-label="Тестовое заполнение Яндекс Формы" hidden>
+          <button class="td-request-button" id="td-yandex-start" type="button">Заполнить тестовую заявку</button>
+          <p class="td-yandex-status" id="td-yandex-status" role="status" aria-live="polite" hidden></p>
+          <div id="td-yandex-stage" hidden>
+            <button class="td-back" id="td-yandex-change" type="button">Изменить параметры</button>
+            <p class="td-yandex-note">При возврате к параметрам заполнение тестовой формы начнётся заново.</p>
+            <iframe class="td-yandex-frame" id="td-yandex-frame" title="Тестовая заявка to Dublin — Яндекс Формы" referrerpolicy="no-referrer"></iframe>
+            <a class="td-yandex-external" id="td-yandex-external" target="_blank" rel="noopener noreferrer">Открыть форму отдельно</a>
+          </div>
+        </section>
         <form class="td-request-form" id="td-request-form" novalidate>
           <fieldset class="td-form-fields" disabled aria-label="Неактивная форма заявки">
             <input id="td-request-purpose" name="request_purpose" type="hidden" value="event">
@@ -383,7 +393,9 @@
   </dialog>
   <script src="media-loader.js?v=1"></script>
   <script src="app.js?v=clean-hero-12"></script>
-  <script src="package-offer.js?v=general-inquiry-1"></script>
+  <script src="inquiry-config.js?v=yandex-test-1"></script>
+  <script src="package-inquiry-yandex.js?v=yandex-test-1"></script>
+  <script src="package-offer.js?v=yandex-test-1"></script>
   <script src="service-panels.js?v=full-package-1"></script>
   <script src="cookie-notice.js?v=1"></script>
 </body>

@@ -22,8 +22,15 @@
         purposeInput:get('td-request-purpose'), attach:get('td-request-attach'), attachControl:get('td-attach-control'), attachError:get('td-attach-error'),
         requestSummary:get('td-request-summary'), requestGrid:get('td-request-grid'), editRequest:get('td-request-edit'),
         dateField:get('td-request-date-field'), dateLabel:get('td-request-date-label'),
-        detailsLabel:get('td-request-details-label'), detailsInput:get('td-request-details')
+        detailsLabel:get('td-request-details-label'), detailsInput:get('td-request-details'),
+        previewNote:get('td-preview-note'), purposeFields:get('td-request-purpose-fields'),
+        yandexPanel:get('td-yandex-panel'), yandexStart:get('td-yandex-start'),
+        yandexStage:get('td-yandex-stage'), yandexFrame:get('td-yandex-frame'),
+        yandexStatus:get('td-yandex-status'), yandexChange:get('td-yandex-change'), yandexExternal:get('td-yandex-external')
       };
+      const yandex = window.ToDublinYandexRequest;
+      const yandexAvailable = Boolean(yandex && yandex.isAvailable());
+      let yandexStarted = false;
       const PACKAGE_NAME = 'Мероприятие';
       const BEER = 'Black Sheep Irish Stout';
       const MAX_EXTRA_KEGS = Math.floor((Number.MAX_SAFE_INTEGER - 390000) / 9000);
@@ -65,7 +72,7 @@
       }
       let state = normalize();
       let builderExpanded = false;
-      let requestOpen = false;
+      let requestOpen = yandexAvailable;
       let requestPurpose = 'event';
       let attachConfiguration = false;
       const purposes = {
@@ -200,6 +207,17 @@
         ui.dateLabel.textContent = purpose.dateLabel || 'Дата, если известна';
         ui.detailsLabel.textContent = purpose.detailsLabel;
         ui.detailsInput.placeholder = purpose.placeholder;
+        ui.requestForm.hidden = yandexAvailable;
+        ui.yandexPanel.hidden = !yandexAvailable;
+        ui.requestGrid.classList.toggle('is-yandex-test', yandexAvailable);
+        ui.purposeFields.hidden = yandexStarted;
+        ui.attachControl.hidden = requestPurpose !== 'event' || yandexStarted;
+        ui.yandexStart.hidden = yandexStarted;
+        ui.yandexStart.disabled = wantsConfiguration && invalid;
+        ui.yandexStage.hidden = !yandexStarted;
+        ui.previewNote.textContent = yandexAvailable ?
+          (yandex.isTestMode() ? 'Тестовый режим. Используйте только вымышленные данные.' : 'Контакты и согласие заполните в форме ниже.') :
+          'Макет формы — ввод данных и отправка пока отключены.';
       }
       function changed() {
         render();
@@ -248,8 +266,44 @@
         const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         section?.scrollIntoView({behavior:reduced ? 'auto' : 'smooth',block:'start'});
       }
+      function resetYandex() {
+        yandexStarted = false;
+        ui.yandexFrame.removeAttribute('src');
+        ui.yandexExternal.removeAttribute('href');
+        ui.yandexStatus.hidden = true;
+      }
+      ui.yandexStart.addEventListener('click', () => {
+        if (!yandexAvailable || (requestPurpose === 'event' && attachConfiguration && hasErrors())) return;
+        const context = {
+          purpose:requestPurpose,
+          configuration:requestPurpose === 'event' && attachConfiguration ? summary() : ''
+        };
+        const url = yandex.buildUrl(context);
+        if (!url) {
+          ui.yandexStatus.textContent = 'Не удалось открыть форму. Проверьте параметры заявки.';
+          ui.yandexStatus.hidden = false;
+          return;
+        }
+        ui.yandexStatus.textContent = 'Загружаем Яндекс Форму…';
+        ui.yandexStatus.hidden = false;
+        ui.yandexFrame.src = url;
+        ui.yandexExternal.href = yandex.buildUrl(context, false);
+        yandexStarted = true;
+        render();
+        ui.yandexChange.focus({preventScroll:true});
+      });
+      ui.yandexFrame.addEventListener('load', () => {
+        if (yandexStarted) ui.yandexStatus.hidden = true;
+      });
+      ui.yandexChange.addEventListener('click', () => {
+        resetYandex();
+        render();
+        ui.yandexStart.focus({preventScroll:true});
+      });
+      if (yandexAvailable) yandex.bindResize(ui.yandexFrame);
       function openRequest(withConfiguration = false) {
         if (withConfiguration && hasErrors()) return;
+        resetYandex();
         if (withConfiguration) requestPurpose = 'event';
         attachConfiguration = withConfiguration;
         requestOpen = true;
@@ -261,16 +315,19 @@
       ui.baseRequest.addEventListener('click', () => openRequest(true));
       purposeButtons.forEach(item => {
         item.button.addEventListener('click', () => {
+          if (yandexStarted) resetYandex();
           requestPurpose = item.key;
           if (requestPurpose !== 'event') attachConfiguration = false;
           render();
         });
       });
       ui.attach.addEventListener('change', () => {
+        if (yandexStarted) resetYandex();
         attachConfiguration = requestPurpose === 'event' && ui.attach.checked;
         render();
       });
       ui.editRequest.addEventListener('click', () => {
+        resetYandex();
         requestOpen = false;
         builderExpanded = true;
         render();
@@ -279,6 +336,7 @@
         scrollToOffer();
       });
       ui.back.addEventListener('click', () => {
+        resetYandex();
         requestOpen = false;
         render();
         const returnButton = builderExpanded ? ui.requestOpen : ui.baseRequest;
@@ -293,4 +351,5 @@
       });
       ui.requestForm.addEventListener('submit', event => event.preventDefault());
       render(true);
+      if (yandexAvailable) scrollToOffer();
     })();
