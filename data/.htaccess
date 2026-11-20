@@ -1,0 +1,7 @@
+Options -Indexes
+<FilesMatch "\.json$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-store, max-age=0"
+    Header set X-Content-Type-Options "nosniff"
+  </IfModule>
+</FilesMatch>

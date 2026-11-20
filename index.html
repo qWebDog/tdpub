@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="legal.css?v=1">
   <link rel="stylesheet" href="unified.css?v=lighting-quality-6">
   <link rel="stylesheet" href="package-offer.css?v=telegram-chat-1">
+  <link rel="stylesheet" href="gallery.css?v=admin-content-1">
   <meta property="og:image" content="https://qwebdog.github.io/tdpub/social-preview.jpg?v=night-lights-1">
   <meta property="og:image:secure_url" content="https://qwebdog.github.io/tdpub/social-preview.jpg?v=night-lights-1">
   <meta property="og:image:type" content="image/jpeg">
@@ -105,6 +106,16 @@
         <article><span>03</span><h3>Фестивали</h3><p>Атмосфера паба для гостей фестиваля.</p></article>
       </div>
     </section>
+    <section class="service-section td-gallery" id="gallery" aria-labelledby="galleryTitle" data-gallery-state="awaiting-photos" hidden>
+      <div class="td-gallery-header">
+        <div>
+          <p class="service-eyebrow">В хорошей компании</p>
+          <h2 id="galleryTitle">Атмосфера в кадре</h2>
+        </div>
+        <p class="td-gallery-description">Свой паб, тёплый свет и люди, с которыми хорошо.</p>
+      </div>
+      <div class="td-gallery-grid"></div>
+    </section>
     <section class="service-section" id="included">
       <p class="service-eyebrow">Одно решение</p>
       <h2>Барный кейтеринг</h2>
@@ -129,7 +140,7 @@
     <header class="td-offer-heading">
       <h2 id="td-package-heading" aria-label="Название комплекта">Мероприятие</h2>
       <p class="td-offer-description">Базовая стоимость</p>
-      <p class="td-base-price">150 000 ₽<span class="td-price-note">за 8 часов</span></p>
+      <p class="td-base-price"><span id="td-base-price-value">150 000 ₽</span><span class="td-price-note">за 8 часов</span></p>
     </header>
     </div>
     </div>
@@ -253,9 +264,9 @@
           <output class="td-total" id="td-total" aria-live="polite" aria-atomic="true">150 000 ₽</output>
           <p class="td-duration" id="td-duration">Всего 8 часов</p>
           <dl class="td-breakdown" id="td-breakdown" hidden>
-            <div><dt id="td-base-label">Базовые 8 часов</dt><dd>150 000 ₽</dd></div>
+            <div><dt id="td-base-label">Базовые 8 часов</dt><dd id="td-base-breakdown-value">150 000 ₽</dd></div>
             <div id="td-hours-row" hidden><dt id="td-extension-label">Продление</dt><dd id="td-hours-charge">0 ₽</dd></div>
-            <div id="td-generator-row" hidden><dt>Без генератора</dt><dd>−20 000 ₽</dd></div>
+            <div id="td-generator-row" hidden><dt>Без генератора</dt><dd id="td-generator-discount-value">−20 000 ₽</dd></div>
             <div id="td-barrels-row" hidden><dt id="td-removed-label">Убрано бочек: 0</dt><dd id="td-barrels-saving">0 ₽</dd></div>
             <div id="td-kegs-row" hidden><dt id="td-kegs-label">Дополнительные кеги</dt><dd id="td-kegs-charge">0 ₽</dd></div>
           </dl>
@@ -291,7 +302,7 @@
       <details name="faq" open><summary>Где вы работаете?</summary><p>Москва и Московская область. Выезды по России обсуждаем отдельно.</p></details>
       <details name="faq"><summary>Для каких событий?</summary><p>Частные праздники, корпоративы и фестивали. Другой повод? Расскажите о нём в заявке.</p></details>
       <details name="faq"><summary>Что входит в кейтеринг?</summary><p>Мобильный паб, оборудование, персонал и напитки. Состав и условия согласуем под ваше событие.</p></details>
-      <details name="faq" id="event-questions"><summary>Сколько стоит аренда?</summary><p>Базовая стоимость — 150&nbsp;000&nbsp;₽ за 8 часов. Продление — 15&nbsp;000&nbsp;₽ за каждый следующий час. Многодневные мероприятия обсуждаем отдельно. <a href="#package">Состав и расчёт стоимости</a>.</p></details>
+      <details name="faq" id="event-questions"><summary>Сколько стоит аренда?</summary><p>Базовая стоимость — <span id="td-faq-base-price">150&nbsp;000&nbsp;₽</span> за 8 часов. Продление — <span id="td-faq-extra-hour-price">15&nbsp;000&nbsp;₽</span> за каждый следующий час. Многодневные мероприятия обсуждаем отдельно. <a href="#package">Состав и расчёт стоимости</a>.</p></details>
       <details name="faq"><summary>Что нужно от площадки?</summary><p>Укажите город или площадку. Подъезд, размещение и условия работы паба обсудим при согласовании.</p></details>
       <details name="faq"><summary>Как связаться?</summary><p>Нажмите «Пригласить паб» или «Обсудить в Telegram» — откроется наш чат. Напишите о мероприятии, приглашении на фестиваль или предложении о сотрудничестве.</p></details>
     </section>
@@ -305,6 +316,26 @@
   <div class="service-bottom-actions">
     <a class="primary-button service-invite-button" href="https://t.me/qwebdog" target="_blank" rel="noopener noreferrer" aria-label="Пригласить паб — открыть чат в Telegram">Пригласить паб</a>
   </div>
+  <dialog id="galleryLightbox" class="td-gallery-lightbox" aria-labelledby="galleryLightboxTitle" aria-describedby="galleryCaption">
+    <div class="td-gallery-lightbox-header">
+      <p id="galleryLightboxTitle">to Dublin · в кадре</p>
+      <button class="td-gallery-close cursor-interaction" type="button" data-gallery-close aria-label="Закрыть фотографии" autofocus>×</button>
+    </div>
+    <div class="td-gallery-viewport">
+      <img id="galleryPhoto" alt="" decoding="async">
+      <p class="td-gallery-loading" id="galleryLoading" role="status" aria-live="polite" hidden></p>
+    </div>
+    <div class="td-gallery-lightbox-footer">
+      <div class="td-gallery-lightbox-caption">
+        <p id="galleryCaption"></p>
+        <span id="galleryPosition" aria-live="polite"></span>
+      </div>
+      <div class="td-gallery-controls" aria-label="Перелистывание фотографий">
+        <button class="td-gallery-control cursor-interaction" type="button" data-gallery-previous>Назад</button>
+        <button class="td-gallery-control cursor-interaction" type="button" data-gallery-next>Далее</button>
+      </div>
+    </div>
+  </dialog>
   <dialog id="serviceMenu" class="service-menu" aria-labelledby="serviceMenuTitle">
     <div class="service-menu-heading">
       <p id="serviceMenuTitle">Разделы страницы</p>
@@ -314,6 +345,7 @@
       <a href="#experience">Главный экран</a>
       <a href="#overview">О пабе</a>
       <a href="#format">Форматы мероприятий</a>
+      <a href="#gallery" hidden>Фотографии</a>
       <a href="#included">Барный кейтеринг</a>
       <a href="#package">Мероприятие и стоимость</a>
       <a href="#geography">География</a>
@@ -324,8 +356,10 @@
   </dialog>
   <script src="media-loader.js?v=1"></script>
   <script src="app.js?v=clean-hero-12"></script>
-  <script src="package-offer.js?v=telegram-chat-1"></script>
-  <script src="service-panels.js?v=full-package-1"></script>
+  <script src="site-content.js?v=admin-content-1"></script>
+  <script src="package-offer.js?v=admin-content-1"></script>
+  <script src="gallery.js?v=admin-content-1"></script>
+  <script src="service-panels.js?v=admin-content-1"></script>
   <script src="cookie-notice.js?v=1"></script>
 </body>
 </html>

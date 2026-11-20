@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "pricing": {
+    "base": 150000,
+    "generatorDiscount": 20000,
+    "barrelDiscount": 5000,
+    "extraHour": 15000,
+    "extraKeg": 9000
+  },
+  "gallery": {
+    "items": []
+  }
+}

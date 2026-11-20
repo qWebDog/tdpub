@@ -7,6 +7,7 @@
         configure:get('td-configure'), configureLabel:get('td-configure-label'),
         builder:get('td-builder-panel'), selectedSummary:get('td-selected-summary'),
         generatorButton:get('td-generator-remove'), generatorHelp:get('td-generator-help'),
+        barrelsHelp:get('td-barrels-help'), kegsHelp:get('td-kegs-help'), hoursHelp:get('td-hours-help'),
         barrels:get('td-barrels'), hours:get('td-hours'), kegs:get('td-kegs'),
         singleDay:get('td-single-day'), multiDay:get('td-multi-day'),
         barrelValue:get('td-barrels-value'), hourValue:get('td-hours-value'), hoursField:get('td-hours-field'),
@@ -18,8 +19,31 @@
         baseRequest:get('td-request-base')
       };
       const PACKAGE_NAME = 'Мероприятие';
-      const MAX_EXTRA_KEGS = Math.floor((Number.MAX_SAFE_INTEGER - 390000) / 9000);
+      const DEFAULT_PRICING = Object.freeze({base:150000,generatorDiscount:20000,barrelDiscount:5000,extraHour:15000,extraKeg:9000});
+      function validPricing(raw) {
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+        const result = {};
+        for (const key of Object.keys(DEFAULT_PRICING)) {
+          const value = raw[key];
+          if (!Number.isSafeInteger(value) || value < 0 || value > 100000000) return null;
+          result[key] = value;
+        }
+        if (result.extraKeg < 1 || result.base < result.generatorDiscount + 7 * result.barrelDiscount) return null;
+        return result;
+      }
+      let pricing = validPricing(window.ToDublinContent?.current?.pricing) || DEFAULT_PRICING;
+      function safeExtraKegLimit() {
+        // Reserve the largest single-day base/extension total before allowing extra kegs.
+        // One included keg must also fit in the safe-integer input count.
+        const reserve = pricing.base + 16 * pricing.extraHour;
+        return Math.min(Number.MAX_SAFE_INTEGER - 1, Math.floor((Number.MAX_SAFE_INTEGER - reserve) / pricing.extraKeg));
+      }
+      let maxExtraKegs = safeExtraKegLimit();
       const money = value => new Intl.NumberFormat('ru-RU', {maximumFractionDigits:0}).format(value) + ' ₽';
+      function optionalText(id, value) {
+        const node = document.getElementById(id);
+        if (node) node.textContent = value;
+      }
       function parseInteger(value) {
         if (typeof value === 'string') {
           value = value.trim();
@@ -39,13 +63,13 @@
           generator:raw.generator !== false,
           barrels:integer(raw.barrels,7,0,7),
           extraHours:integer(raw.extraHours,0,0,16),
-          extraKegs:integer(raw.extraKegs,0,0,MAX_EXTRA_KEGS),
+          extraKegs:integer(raw.extraKegs,0,0,maxExtraKegs),
           multiday:raw.multiday === true
         };
       }
       function calculate(raw) {
         const s = normalize(raw);
-        return s.multiday ? null : 150000 - (s.generator ? 0 : 20000) - (7-s.barrels)*5000 + s.extraHours*15000 + s.extraKegs*9000;
+        return s.multiday ? null : pricing.base - (s.generator ? 0 : pricing.generatorDiscount) - (7-s.barrels)*pricing.barrelDiscount + s.extraHours*pricing.extraHour + s.extraKegs*pricing.extraKeg;
       }
       function countLabel(count, one, few, many) {
         const rem = count % 100;
@@ -61,7 +85,7 @@
       const fields = {};
       const specs = {
         barrels:{min:0,max:7,error:'Введите целое число от 0 до 7.'},
-        kegs:{min:1,max:MAX_EXTRA_KEGS+1,error:'Введите целое число кегов — не меньше 1.'},
+        kegs:{min:1,max:maxExtraKegs+1,error:''},
         hours:{min:0,max:16,error:'Введите целое число от 0 до 16. Для более длительного события выберите «Несколько дней».'}
       };
       Object.keys(specs).forEach(key => {
@@ -71,7 +95,13 @@
           errorNode:get('td-' + key + '-error')
         };
       });
-      ui.kegs.max = String(MAX_EXTRA_KEGS+1);
+      function updateKegLimit() {
+        maxExtraKegs = safeExtraKegLimit();
+        fields.kegs.max = maxExtraKegs + 1;
+        fields.kegs.error = 'Введите целое число кегов от 1 до ' + new Intl.NumberFormat('ru-RU').format(fields.kegs.max) + '.';
+        ui.kegs.max = String(fields.kegs.max);
+      }
+      updateKegLimit();
       const hasErrors = () => Object.values(errors).some(Boolean);
       function fieldValue(key) {
         return key === 'hours' ? state.extraHours : key === 'kegs' ? state.extraKegs+1 : state.barrels;
@@ -104,17 +134,25 @@
         const price = calculate(state);
         ui.heading.textContent = state.packageName;
         ui.baseLabel.textContent = 'Базовые 8 часов';
+        optionalText('td-base-price-value', money(pricing.base));
+        optionalText('td-base-breakdown-value', money(pricing.base));
+        optionalText('td-generator-discount-value', '−' + money(pricing.generatorDiscount));
+        optionalText('td-faq-base-price', money(pricing.base));
+        optionalText('td-faq-extra-hour-price', money(pricing.extraHour));
+        ui.barrelsHelp.textContent = '−' + money(pricing.barrelDiscount) + ' за каждый убранный стол';
+        ui.kegsHelp.textContent = 'Первый включён · +' + money(pricing.extraKeg) + ' за дополнительный';
+        ui.hoursHelp.textContent = '+' + money(pricing.extraHour) + ' за час';
         ui.singleDay.setAttribute('aria-pressed', String(!state.multiday));
         ui.multiDay.setAttribute('aria-pressed', String(state.multiday));
         ui.hoursField.classList.toggle('is-disabled', state.multiday);
         ui.generatorButton.textContent = state.generator ? 'Не нужен' : 'Вернуть';
         ui.generatorButton.setAttribute('aria-pressed', String(!state.generator));
         ui.generatorButton.setAttribute('aria-label', state.generator ? 'Убрать генератор из комплекта' : 'Вернуть генератор в комплект');
-        ui.generatorHelp.textContent = state.generator ? 'Без него: −20 000 ₽' : 'Убран · −20 000 ₽';
-        ui.generatorValue.textContent = state.generator ? 'Генератор в комплекте' : 'Генератор убран: −20 000 ₽';
-        ui.barrelValue.textContent = errors.barrels ? '—' : state.barrels === 7 ? 'Все 7 включены' : '−' + money((7-state.barrels)*5000);
-        ui.kegValue.textContent = errors.kegs ? '—' : state.extraKegs === 0 ? '1 кег включён' : '+' + money(state.extraKegs*9000);
-        ui.hourValue.textContent = state.multiday ? 'По согласованию' : errors.hours ? '—' : state.extraHours === 0 ? 'Без продления' : '+' + money(state.extraHours*15000);
+        ui.generatorHelp.textContent = (state.generator ? 'Без него: −' : 'Убран · −') + money(pricing.generatorDiscount);
+        ui.generatorValue.textContent = state.generator ? 'Генератор в комплекте' : 'Генератор убран: −' + money(pricing.generatorDiscount);
+        ui.barrelValue.textContent = errors.barrels ? '—' : state.barrels === 7 ? 'Все 7 включены' : '−' + money((7-state.barrels)*pricing.barrelDiscount);
+        ui.kegValue.textContent = errors.kegs ? '—' : state.extraKegs === 0 ? '1 кег включён' : '+' + money(state.extraKegs*pricing.extraKeg);
+        ui.hourValue.textContent = state.multiday ? 'По согласованию' : errors.hours ? '—' : state.extraHours === 0 ? 'Без продления' : '+' + money(state.extraHours*pricing.extraHour);
         ui.total.textContent = invalid ? 'Проверьте значения' : price === null ? 'По согласованию' : money(price);
         ui.total.classList.toggle('is-negotiated', invalid || price === null);
         ui.duration.textContent = invalid ? 'Исправьте выделенные поля.' : state.multiday ? 'На несколько дней' : 'Всего ' + hourLabel(8+state.extraHours);
@@ -130,11 +168,11 @@
         ui.hourRow.hidden = state.extraHours === 0;
         ui.kegRow.hidden = state.extraKegs === 0;
         ui.removedLabel.textContent = 'Убрано столов-бочек: ' + (7-state.barrels);
-        ui.barrelSaving.textContent = '−' + money((7-state.barrels)*5000);
+        ui.barrelSaving.textContent = '−' + money((7-state.barrels)*pricing.barrelDiscount);
         ui.extensionLabel.textContent = 'Продление: ' + hourLabel(state.extraHours);
-        ui.hourCharge.textContent = '+' + money(state.extraHours*15000);
+        ui.hourCharge.textContent = '+' + money(state.extraHours*pricing.extraHour);
         ui.kegLabel.textContent = 'Дополнительные кеги: ' + state.extraKegs;
-        ui.kegCharge.textContent = '+' + money(state.extraKegs*9000);
+        ui.kegCharge.textContent = '+' + money(state.extraKegs*pricing.extraKeg);
         ui.baseRequest.hidden = builderExpanded;
       }
       function changed() {
@@ -179,5 +217,18 @@
       }
       ui.singleDay.addEventListener('click', () => chooseDays(false));
       ui.multiDay.addEventListener('click', () => chooseDays(true));
+      document.addEventListener('to-dublin:content-ready', event => {
+        const next = validPricing(event.detail?.content?.pricing);
+        if (!next) return;
+        pricing = next;
+        updateKegLimit();
+        // Keep entered text and unrelated errors. If a new rate reduces the safe
+        // keg limit, show an error rather than silently replacing the input.
+        const enteredKegs = readField('kegs');
+        errors.kegs = enteredKegs === null;
+        if (enteredKegs !== null) assignField('kegs', enteredKegs);
+        else state.extraKegs = Math.min(state.extraKegs, maxExtraKegs);
+        render();
+      });
       render(true);
     })();

@@ -3,7 +3,7 @@
   const main = document.querySelector('.service-main');
   const header = document.querySelector('.service-nav');
   if (!main || !header || document.body.classList.contains('service-flow-active')) return;
-  const sections = [...main.children].filter(node => node.tagName === 'SECTION');
+  let sections = [...main.children].filter(node => node.tagName === 'SECTION' && !node.hidden);
   if (sections.length < 2) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const root = document.documentElement;
@@ -75,11 +75,13 @@
   }
   function queueRender() { if (frame === null) frame = requestAnimationFrame(render); }
   function measure() {
+    sections = [...main.children].filter(node => node.tagName === 'SECTION' && !node.hidden);
+    index = Math.min(index, Math.max(0, sections.length - 1));
     headerHeight = Math.ceil(header.getBoundingClientRect().height);
     root.style.setProperty('--service-nav-height', headerHeight + 'px');
     queueRender();
   }
-  const revealItems = [...main.querySelectorAll('.service-intro > div, .service-video, .service-section > .service-eyebrow, .service-section > h2, .service-section > p:not(.service-eyebrow), .service-cards > article, .service-inclusions > div, .package-offer, .service-process > li, .service-faq > details, .service-final > h2, .service-final > p')];
+  let revealItems = [...main.querySelectorAll('.service-intro > div, .service-video, .service-section > .service-eyebrow, .service-section > h2, .service-section > p:not(.service-eyebrow), .service-cards > article, .service-inclusions > div, .package-offer, .service-process > li, .td-gallery-header, .td-gallery-tile, .service-faq > details, .service-final > h2, .service-final > p')];
   let revealObserver = null;
   function reveal(item) {
     item.classList.remove('is-pending'); item.classList.add('is-visible');
@@ -101,6 +103,23 @@
     try { target = document.getElementById(decodeURIComponent(hash.slice(1))); } catch (_) { return null; }
     return sections.find(section => section === target || section.contains(target)) || null;
   }
+  document.addEventListener('to-dublin:gallery-ready', () => {
+    revealItems = revealItems.filter(item => {
+      if (main.contains(item)) return true;
+      revealObserver?.unobserve(item);
+      return false;
+    });
+    main.querySelectorAll('.td-gallery-tile').forEach(item => {
+      if (revealItems.includes(item)) return;
+      revealItems.push(item);
+      if (revealObserver && !reduced.matches && !item.hidden) {
+        item.classList.add('service-reveal', 'is-pending');
+        revealObserver.observe(item);
+      } else reveal(item);
+    });
+    measure();
+    updateActions();
+  });
   function go(section) {
     revealWithin(section);
     section.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
